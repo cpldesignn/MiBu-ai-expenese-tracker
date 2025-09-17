@@ -1,0 +1,1215 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark light">
+  <title>Tracker — MiBu</title>
+  <style>
+    :root {
+      --bg: #000000;
+      --bg-2: #111111;
+      --text: #ffffff;
+      --muted: #888888;
+      --brand: #ffffff;
+      --accent: #cccccc;
+      --glass: rgba(255, 255, 255, 0.03);
+      --border: rgba(255, 255, 255, 0.08);
+      --shadow-strong: 0 8px 32px rgba(0, 0, 0, 0.6);
+      --radius: 8px;
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      height: 100%;
+      background: var(--bg);
+      color: var(--text);
+      margin: 0;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    /* Navigation */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      backdrop-filter: blur(10px);
+      background: rgba(0, 0, 0, 0.8);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav {
+      max-width: 1120px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 20px;
+    }
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+    }
+    .brand-logo {
+      width: 28px;
+      height: 28px;
+      border-radius: 4px;
+      background: linear-gradient(135deg, #ffffff, #cccccc);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    }
+    .nav-cta {
+      display: inline-flex;
+      gap: 8px;
+      align-items: center;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.05);
+      color: var(--text);
+      transition: all 0.2s ease;
+      font-weight: 500;
+    }
+    .btn:hover { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.2); }
+    .btn-primary {
+      background: #ffffff;
+      border: none;
+      color: #000000;
+      font-weight: 600;
+    }
+    .btn-primary:hover { background: #f0f0f0; }
+
+    /* User Profile */
+    .user-profile {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      padding: 4px;
+      border-radius: 6px;
+      transition: background 0.2s ease;
+    }
+    .user-profile:hover {
+      background: rgba(255,255,255,0.05);
+    }
+    .user-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #ffffff, #cccccc);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 600;
+      color: #000000;
+      overflow: hidden;
+    }
+    .user-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .user-name {
+      font-size: 14px;
+      font-weight: 500;
+      max-width: 120px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    @media (max-width: 600px) {
+      .user-name { display: none; }
+    }
+
+    /* Main Layout */
+    main { 
+      max-width: 1120px; 
+      margin: 0 auto; 
+      padding: 20px; 
+      min-height: calc(100vh - 120px); 
+    }
+    
+    .page-title {
+      text-align: center;
+      margin: 20px 0 30px;
+      font-size: clamp(32px, 5vw, 48px);
+      font-weight: 900;
+      letter-spacing: -1px;
+      color: var(--text);
+    }
+
+    .tracker-container {
+      display: grid;
+      grid-template-columns: 1fr 300px;
+      gap: 24px;
+    }
+    @media (max-width: 900px) {
+      .tracker-container { grid-template-columns: 1fr; }
+    }
+
+    .glass {
+      position: relative;
+      background: rgba(255,255,255,0.02);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-strong);
+      overflow: hidden;
+    }
+
+    /* Add Expense Form */
+    .add-expense {
+      padding: 24px;
+      margin-bottom: 24px;
+    }
+    .add-expense h2 {
+      margin: 0 0 20px;
+      font-size: 20px;
+      font-weight: 700;
+    }
+     .form-grid {
+       display: grid;
+       grid-template-columns: 1fr 120px 1fr;
+       gap: 12px;
+       margin-bottom: 16px;
+     }
+     @media (max-width: 600px) {
+       .form-grid { grid-template-columns: 1fr; }
+     }
+    
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    label {
+      font-size: 14px;
+      color: var(--muted);
+      font-weight: 500;
+    }
+    input, select {
+      padding: 12px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.05);
+      color: var(--text);
+      font-size: 14px;
+    }
+     input:focus, select:focus {
+       outline: none;
+       border-color: rgba(255,255,255,0.2);
+       background: rgba(255,255,255,0.08);
+     }
+     
+     /* Remove number input spinners */
+     input[type="number"]::-webkit-outer-spin-button,
+     input[type="number"]::-webkit-inner-spin-button {
+       -webkit-appearance: none;
+       margin: 0;
+     }
+     input[type="number"] {
+       -moz-appearance: textfield;
+       appearance: textfield;
+     }
+     
+     .ai-category-display {
+       display: flex;
+       flex-direction: column;
+       gap: 6px;
+     }
+     .category-preview {
+       padding: 12px;
+       border-radius: 6px;
+       border: 1px solid var(--border);
+       background: rgba(255,255,255,0.02);
+       color: var(--muted);
+       font-size: 14px;
+       min-height: 42px;
+       display: flex;
+       align-items: center;
+       transition: all 0.3s ease;
+     }
+     .category-preview.active {
+       color: var(--text);
+       background: rgba(255,255,255,0.05);
+       border-color: rgba(255,255,255,0.15);
+     }
+     .category-badge {
+       display: inline-flex;
+       align-items: center;
+       gap: 6px;
+       padding: 4px 8px;
+       border-radius: 12px;
+       background: rgba(255,255,255,0.1);
+       font-size: 12px;
+       font-weight: 500;
+     }
+
+    /* Expense List */
+    .expense-list {
+      padding: 24px;
+    }
+    .expense-list h2 {
+      margin: 0 0 20px;
+      font-size: 20px;
+      font-weight: 700;
+    }
+    .expense-item {
+      display: grid;
+      grid-template-columns: 1fr 80px 60px;
+      gap: 12px;
+      padding: 16px;
+      border-radius: 6px;
+      background: rgba(255,255,255,0.02);
+      border: 1px solid var(--border);
+      margin-bottom: 12px;
+      align-items: center;
+    }
+    .expense-info h3 {
+      margin: 0 0 4px;
+      font-size: 16px;
+      font-weight: 600;
+    }
+    .expense-info p {
+      margin: 0;
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .expense-amount {
+      text-align: right;
+      font-weight: 700;
+      font-size: 16px;
+    }
+    .delete-btn {
+      background: none;
+      border: 1px solid rgba(255,255,255,0.1);
+      color: var(--muted);
+      padding: 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .delete-btn:hover {
+      background: rgba(255,0,0,0.1);
+      border-color: rgba(255,0,0,0.3);
+      color: #ff6b6b;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+    .summary-card {
+      padding: 20px;
+    }
+    .summary-card h3 {
+      margin: 0 0 16px;
+      font-size: 18px;
+      font-weight: 700;
+    }
+    .summary-item {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border);
+    }
+    .summary-item:last-child {
+      border-bottom: none;
+      margin-bottom: 0;
+    }
+    .summary-label {
+      color: var(--muted);
+      font-size: 14px;
+    }
+    .summary-value {
+      font-weight: 600;
+      font-size: 14px;
+    }
+
+    /* AI Chat */
+    .ai-chat {
+      padding: 20px;
+      height: 300px;
+      display: flex;
+      flex-direction: column;
+    }
+    .ai-chat h3 {
+      margin: 0 0 16px;
+      font-size: 18px;
+      font-weight: 700;
+    }
+    .chat-area {
+      flex: 1;
+      background: rgba(255,255,255,0.02);
+      border-radius: 6px;
+      padding: 12px;
+      margin-bottom: 12px;
+      overflow-y: auto;
+      font-size: 14px;
+      color: var(--muted);
+    }
+    .chat-input {
+      display: flex;
+      gap: 8px;
+    }
+    .chat-input input {
+      flex: 1;
+      padding: 8px 12px;
+      font-size: 14px;
+    }
+    .chat-send {
+      padding: 8px 16px;
+      background: #ffffff;
+      color: #000000;
+      border: none;
+      border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    /* Empty State */
+    .empty-state {
+      text-align: center;
+      padding: 40px 20px;
+      color: var(--muted);
+    }
+    .empty-state h3 {
+      margin: 0 0 8px;
+      font-size: 18px;
+      color: var(--text);
+    }
+
+     footer { 
+       text-align: center;
+       padding: 20px;
+       color: var(--muted);
+       font-size: 14px;
+       border-top: 1px solid var(--border);
+       margin-top: 40px;
+     }
+
+     /* Import Modal */
+     .modal {
+       position: fixed;
+       inset: 0;
+       background: rgba(0, 0, 0, 0.8);
+       display: none;
+       place-items: center;
+       z-index: 1000;
+       backdrop-filter: blur(8px);
+     }
+     .modal.show {
+       display: grid;
+     }
+     .modal-content {
+       background: var(--bg);
+       border: 1px solid var(--border);
+       border-radius: 12px;
+       padding: 32px;
+       max-width: 500px;
+       width: 90%;
+       position: relative;
+     }
+     .modal-header {
+       display: flex;
+       justify-content: space-between;
+       align-items: center;
+       margin-bottom: 24px;
+     }
+     .modal-title {
+       font-size: 24px;
+       font-weight: 700;
+       margin: 0;
+     }
+     .close-btn {
+       background: none;
+       border: none;
+       color: var(--muted);
+       font-size: 24px;
+       cursor: pointer;
+       padding: 4px;
+       border-radius: 4px;
+       transition: color 0.2s ease;
+     }
+     .close-btn:hover {
+       color: var(--text);
+       background: rgba(255,255,255,0.1);
+     }
+     
+     .upload-area {
+       border: 2px dashed var(--border);
+       border-radius: 8px;
+       padding: 40px 20px;
+       text-align: center;
+       margin-bottom: 20px;
+       transition: all 0.3s ease;
+       cursor: pointer;
+     }
+     .upload-area:hover,
+     .upload-area.dragover {
+       border-color: rgba(255,255,255,0.3);
+       background: rgba(255,255,255,0.02);
+     }
+     .upload-icon {
+       font-size: 48px;
+       margin-bottom: 16px;
+       color: var(--muted);
+     }
+     .upload-text {
+       font-size: 16px;
+       margin-bottom: 8px;
+     }
+     .upload-subtext {
+       font-size: 14px;
+       color: var(--muted);
+     }
+     .file-input {
+       display: none;
+     }
+     
+     .processing {
+       display: none;
+       text-align: center;
+       padding: 20px;
+     }
+     .processing.show {
+       display: block;
+     }
+     .spinner {
+       width: 40px;
+       height: 40px;
+       border: 3px solid var(--border);
+       border-top: 3px solid var(--text);
+       border-radius: 50%;
+       animation: spin 1s linear infinite;
+       margin: 0 auto 16px;
+     }
+     @keyframes spin {
+       to { transform: rotate(360deg); }
+     }
+     
+     .results {
+       display: none;
+       margin-top: 20px;
+     }
+     .results.show {
+       display: block;
+     }
+     .results-header {
+       display: flex;
+       justify-content: space-between;
+       align-items: center;
+       margin-bottom: 16px;
+     }
+     .expense-preview {
+       max-height: 300px;
+       overflow-y: auto;
+       border: 1px solid var(--border);
+       border-radius: 6px;
+       padding: 12px;
+       background: rgba(255,255,255,0.02);
+     }
+     .preview-item {
+       display: grid;
+       grid-template-columns: 1fr 80px 80px;
+       gap: 12px;
+       align-items: center;
+       padding: 12px 0;
+       border-bottom: 1px solid var(--border);
+     }
+     .preview-item:last-child {
+       border-bottom: none;
+     }
+     .preview-desc {
+       font-size: 14px;
+     }
+     .preview-category {
+       font-size: 12px;
+       color: var(--muted);
+       margin-top: 4px;
+     }
+     .preview-date {
+       font-size: 12px;
+       color: var(--muted);
+       text-align: center;
+     }
+     .preview-amount {
+       font-weight: 600;
+       color: #ff6b6b;
+       text-align: right;
+     }
+  </style>
+</head>
+<body>
+  <header>
+    <nav class="nav">
+      <a class="brand" href="index.html" aria-label="MiBu Home">
+        <div class="brand-logo"></div>
+        MiBu
+      </a>
+       <div class="nav-cta">
+         <a class="btn" href="index.html">Home</a>
+         <a class="btn btn-primary" href="#" id="importBtn">Import Statement</a>
+         <div class="user-profile" id="userProfile" style="display: none;">
+           <div class="user-avatar" id="userAvatar">
+             <span id="userInitials"></span>
+           </div>
+           <span class="user-name" id="userName"></span>
+         </div>
+       </div>
+    </nav>
+  </header>
+
+  <main>
+    <h1 class="page-title">Track wisely, live freely.</h1>
+    
+    <div class="tracker-container">
+      <div class="main-content">
+        <!-- Add Expense Form -->
+        <div class="glass add-expense">
+          <h2>Add New Expense</h2>
+          <form id="expenseForm">
+             <div class="form-grid">
+               <div class="form-group">
+                 <label for="description">Description</label>
+                 <input type="text" id="description" placeholder="Coffee, Lunch, Uber ride, etc." required>
+               </div>
+               <div class="form-group">
+                 <label for="amount">Amount (₹)</label>
+                 <input type="number" id="amount" step="0.01" placeholder="0.00" required>
+               </div>
+               <div class="form-group">
+                 <div class="ai-category-display">
+                   <label>Category</label>
+                   <div id="suggestedCategory" class="category-preview"></div>
+                 </div>
+               </div>
+             </div>
+            <button type="submit" class="btn btn-primary">Add Expense</button>
+          </form>
+        </div>
+
+        <!-- Expense List -->
+        <div class="glass expense-list">
+          <h2>Recent Expenses</h2>
+          <div id="expensesList">
+            <div class="empty-state">
+              <h3>No expenses yet</h3>
+              <p>Add your first expense above to get started tracking</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="sidebar">
+         <!-- Summary -->
+         <div class="glass summary-card">
+           <h2>Summary</h2>
+           <h4><span id="currentMonth"></span></h4>
+           <div class="summary-item">
+             <span class="summary-label">Today</span>
+             <span class="summary-value" id="todayTotal">₹0.00</span>
+           </div>
+           <div class="summary-item">
+             <span class="summary-label">This Week</span>
+             <span class="summary-value" id="weekTotal">₹0.00</span>
+           </div>
+           <div class="summary-item">
+             <span class="summary-label">This Month</span>
+             <span class="summary-value" id="monthTotal">₹0.00</span>
+           </div>
+           <div class="summary-item">
+             <span class="summary-label">Total Spent.</span>
+             <span class="summary-value" id="totalExpenses">0</span>
+           </div>
+         </div>
+
+        <!-- AI Chat -->
+        <div class="glass ai-chat">
+          <h3>AI Advisor</h3>
+          <div class="chat-area" id="chatArea">
+            <p>👋 Hi! I'm your spending advisor. Add some expenses and I'll help you analyze your patterns and suggest ways to save money.</p>
+          </div>
+          <div class="chat-input">
+            <input type="text" id="chatInput" placeholder="Ask about your spending..." disabled>
+            <button class="chat-send" id="chatSend" disabled>Send</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    © <span id="year"></span> MiBu. All rights reserved.
+  </footer>
+
+  <!-- Import Modal -->
+  <div id="importModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title">Import Bank Statement</h2>
+        <button class="close-btn" id="closeModal">&times;</button>
+      </div>
+      
+      <div id="uploadSection">
+        <div class="upload-area" id="uploadArea">
+          <div class="upload-icon">📄</div>
+          <div class="upload-text">Drop your bank statement PDF here</div>
+          <div class="upload-subtext">or click to browse files</div>
+        </div>
+        <input type="file" id="pdfInput" class="file-input" accept=".pdf" />
+        <p style="font-size: 14px; color: var(--muted); text-align: center; margin-top: 12px;">
+          AI will automatically extract and categorize expenses from your statement
+        </p>
+      </div>
+
+      <div id="processingSection" class="processing">
+        <div class="spinner"></div>
+        <div>Analyzing PDF...</div>
+        <div style="font-size: 14px; color: var(--muted); margin-top: 8px;">
+          Extracting transactions and categorizing expenses
+        </div>
+      </div>
+
+      <div id="resultsSection" class="results">
+        <div class="results-header">
+          <h3>Found <span id="expenseCount">0</span> Expenses</h3>
+          <button class="btn btn-primary" id="importExpenses">Import All</button>
+        </div>
+        <div id="expensePreview" class="expense-preview">
+          <!-- Preview items will be populated here -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Firebase SDKs -->
+  <script type="module">
+    // Import Firebase functions
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+    import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+
+    // Firebase configuration (should match authentication.html)
+    const firebaseConfig = {
+      apiKey: "your-api-key",
+      authDomain: "your-project-id.firebaseapp.com", 
+      projectId: "your-project-id",
+      storageBucket: "your-project-id.appspot.com",
+      messagingSenderId: "your-sender-id",
+      appId: "your-app-id"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    // Authentication management
+    class AuthManager {
+      constructor() {
+        this.currentUser = null;
+        this.init();
+      }
+
+      init() {
+        // Check authentication state
+        onAuthStateChanged(auth, (user) => {
+          if (user) {
+            this.currentUser = user;
+            this.showUserProfile(user);
+          } else {
+            // User is not signed in, redirect to authentication
+            window.location.href = 'authentication.html';
+          }
+        });
+      }
+
+      showUserProfile(user) {
+        const userProfile = document.getElementById('userProfile');
+        const userAvatar = document.getElementById('userAvatar');
+        const userInitials = document.getElementById('userInitials');
+        const userName = document.getElementById('userName');
+
+        // Show user profile
+        userProfile.style.display = 'flex';
+        
+        // Set user name
+        userName.textContent = user.displayName || user.email.split('@')[0];
+        
+        // Set avatar
+        if (user.photoURL) {
+          userAvatar.innerHTML = `<img src="${user.photoURL}" alt="Profile">`;
+        } else {
+          // Use initials as fallback
+          const initials = this.getInitials(user.displayName || user.email);
+          userInitials.textContent = initials;
+        }
+
+        // Add click handler for sign out
+        userProfile.addEventListener('click', () => {
+          this.showSignOutConfirm();
+        });
+      }
+
+      getInitials(name) {
+        if (!name) return 'U';
+        const names = name.split(' ');
+        if (names.length >= 2) {
+          return (names[0][0] + names[1][0]).toUpperCase();
+        }
+        return name[0].toUpperCase();
+      }
+
+      showSignOutConfirm() {
+        const confirmSignOut = confirm('Are you sure you want to sign out?');
+        if (confirmSignOut) {
+          this.signOut();
+        }
+      }
+
+      async signOut() {
+        try {
+          await signOut(auth);
+          localStorage.removeItem('mibu-user');
+          localStorage.removeItem('mibu-expenses');
+          window.location.href = 'index.html';
+        } catch (error) {
+          console.error('Sign out error:', error);
+          alert('Failed to sign out. Please try again.');
+        }
+      }
+    }
+
+    // Initialize authentication manager
+    window.authManager = new AuthManager();
+  </script>
+
+  <script>
+    class ExpenseTracker {
+      constructor() {
+        this.expenses = JSON.parse(localStorage.getItem('mibu-expenses') || '[]');
+        this.init();
+      }
+
+       init() {
+         this.bindEvents();
+         this.render();
+         this.updateSummary();
+         this.setCurrentMonth();
+         this.initAICategories();
+         
+         // Footer year
+         document.getElementById('year').textContent = new Date().getFullYear();
+       }
+
+       initAICategories() {
+         // AI categorization keywords
+         this.categoryKeywords = {
+           food: ['coffee', 'lunch', 'dinner', 'breakfast', 'restaurant', 'food', 'meal', 'snack', 'pizza', 'burger', 'zomato', 'swiggy', 'dominos', 'kfc', 'mcdonalds', 'cafe', 'tea', 'juice', 'grocery', 'vegetables', 'fruits', 'milk', 'bread'],
+           transport: ['uber', 'ola', 'taxi', 'bus', 'metro', 'train', 'flight', 'petrol', 'diesel', 'fuel', 'parking', 'toll', 'auto', 'rickshaw', 'bike', 'car', 'transport', 'travel', 'commute'],
+           shopping: ['amazon', 'flipkart', 'myntra', 'shopping', 'clothes', 'shirt', 'shoes', 'electronics', 'mobile', 'laptop', 'headphones', 'watch', 'bag', 'book', 'gift', 'online', 'store', 'mall'],
+           bills: ['electricity', 'water', 'gas', 'internet', 'wifi', 'mobile bill', 'phone bill', 'rent', 'maintenance', 'insurance', 'loan', 'emi', 'credit card', 'utility', 'broadband', 'cable', 'dtv'],
+           entertainment: ['movie', 'cinema', 'netflix', 'spotify', 'prime', 'hotstar', 'game', 'concert', 'party', 'club', 'bar', 'entertainment', 'fun', 'music', 'youtube', 'subscription'],
+           health: ['doctor', 'medicine', 'pharmacy', 'hospital', 'clinic', 'health', 'medical', 'checkup', 'lab', 'test', 'dentist', 'gym', 'fitness', 'yoga', 'supplements', 'vitamins'],
+           other: ['gift', 'donation', 'miscellaneous', 'other', 'personal', 'savings', 'investment', 'emergency']
+         };
+       }
+
+       setCurrentMonth() {
+         const months = [
+           'January', 'February', 'March', 'April', 'May', 'June',
+           'July', 'August', 'September', 'October', 'November', 'December'
+         ];
+         const now = new Date();
+         document.getElementById('currentMonth').textContent = `${months[now.getMonth()]} ${now.getFullYear()}`;
+       }
+
+       bindEvents() {
+         document.getElementById('expenseForm').addEventListener('submit', (e) => {
+           e.preventDefault();
+           this.addExpense();
+         });
+
+         // Real-time AI category suggestion
+         document.getElementById('description').addEventListener('input', (e) => {
+           this.suggestCategory(e.target.value);
+         });
+
+         document.getElementById('chatSend').addEventListener('click', () => {
+           this.sendChatMessage();
+         });
+
+         document.getElementById('chatInput').addEventListener('keypress', (e) => {
+           if (e.key === 'Enter') {
+             this.sendChatMessage();
+           }
+         });
+
+         // Import functionality
+         document.getElementById('importBtn').addEventListener('click', () => {
+           this.showImportModal();
+         });
+
+         document.getElementById('closeModal').addEventListener('click', () => {
+           this.hideImportModal();
+         });
+
+         document.getElementById('uploadArea').addEventListener('click', () => {
+           document.getElementById('pdfInput').click();
+         });
+
+         document.getElementById('pdfInput').addEventListener('change', (e) => {
+           if (e.target.files[0]) {
+             this.processPDF(e.target.files[0]);
+           }
+         });
+
+         // Drag and drop
+         const uploadArea = document.getElementById('uploadArea');
+         uploadArea.addEventListener('dragover', (e) => {
+           e.preventDefault();
+           uploadArea.classList.add('dragover');
+         });
+
+         uploadArea.addEventListener('dragleave', () => {
+           uploadArea.classList.remove('dragover');
+         });
+
+         uploadArea.addEventListener('drop', (e) => {
+           e.preventDefault();
+           uploadArea.classList.remove('dragover');
+           const files = e.dataTransfer.files;
+           if (files[0] && files[0].type === 'application/pdf') {
+             this.processPDF(files[0]);
+           }
+         });
+
+         document.getElementById('importExpenses').addEventListener('click', () => {
+           this.importFoundExpenses();
+         });
+       }
+
+       suggestCategory(description) {
+         if (!description.trim()) {
+           document.getElementById('suggestedCategory').innerHTML = 'Type description to see category...';
+           document.getElementById('suggestedCategory').classList.remove('active');
+           return;
+         }
+
+         const category = this.categorizeExpense(description);
+         const categoryDisplay = this.formatCategory(category);
+         
+         document.getElementById('suggestedCategory').innerHTML = `
+           <span class="category-badge">🤖 ${categoryDisplay}</span>
+         `;
+         document.getElementById('suggestedCategory').classList.add('active');
+       }
+
+       categorizeExpense(description) {
+         const desc = description.toLowerCase().trim();
+         let maxScore = 0;
+         let bestCategory = 'other';
+
+         // Check each category for keyword matches
+         for (const [category, keywords] of Object.entries(this.categoryKeywords)) {
+           let score = 0;
+           
+           for (const keyword of keywords) {
+             if (desc.includes(keyword)) {
+               // Exact match gets higher score
+               if (desc === keyword) {
+                 score += 10;
+               } else if (desc.startsWith(keyword) || desc.endsWith(keyword)) {
+                 score += 5;
+               } else {
+                 score += 2;
+               }
+             }
+           }
+
+           if (score > maxScore) {
+             maxScore = score;
+             bestCategory = category;
+           }
+         }
+
+         return bestCategory;
+       }
+
+       addExpense() {
+         const description = document.getElementById('description').value;
+         const amount = parseFloat(document.getElementById('amount').value);
+
+         if (!description || !amount) return;
+
+         // Use AI to automatically categorize
+         const category = this.categorizeExpense(description);
+
+        const expense = {
+          id: Date.now(),
+          description,
+          category,
+          amount,
+          date: new Date().toISOString()
+        };
+
+        this.expenses.unshift(expense);
+        this.saveToStorage();
+        this.render();
+        this.updateSummary();
+        this.enableChat();
+        
+         // Reset form
+         document.getElementById('expenseForm').reset();
+         document.getElementById('suggestedCategory').innerHTML = 'Type description to see category...';
+         document.getElementById('suggestedCategory').classList.remove('active');
+      }
+
+       deleteExpense(id) {
+         const expense = this.expenses.find(e => e.id === id);
+         if (!expense) return;
+         
+         const confirmDelete = confirm(`Are you sure you want to delete "${expense.description}" (₹${expense.amount.toFixed(2)})?`);
+         if (!confirmDelete) return;
+         
+         this.expenses = this.expenses.filter(expense => expense.id !== id);
+         this.saveToStorage();
+         this.render();
+         this.updateSummary();
+       }
+
+      render() {
+        const container = document.getElementById('expensesList');
+        
+        if (this.expenses.length === 0) {
+          container.innerHTML = `
+            <div class="empty-state">
+              <h3>No expenses yet</h3>
+              <p>Add your first expense above to get started tracking</p>
+            </div>
+          `;
+          return;
+        }
+
+        container.innerHTML = this.expenses.map(expense => `
+          <div class="expense-item">
+            <div class="expense-info">
+              <h3>${expense.description}</h3>
+              <p>${this.formatCategory(expense.category)} • ${this.formatDate(expense.date)}</p>
+            </div>
+             <div class="expense-amount">₹${expense.amount.toFixed(2)}</div>
+            <button class="delete-btn" onclick="tracker.deleteExpense(${expense.id})" title="Delete">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+            </button>
+          </div>
+        `).join('');
+      }
+
+       updateSummary() {
+         const now = new Date();
+         const today = now.toDateString();
+         const weekStart = new Date(now.setDate(now.getDate() - now.getDay()));
+         const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+
+         const todayTotal = this.expenses
+           .filter(e => new Date(e.date).toDateString() === today)
+           .reduce((sum, e) => sum + e.amount, 0);
+
+         const weekTotal = this.expenses
+           .filter(e => new Date(e.date) >= weekStart)
+           .reduce((sum, e) => sum + e.amount, 0);
+
+         const monthTotal = this.expenses
+           .filter(e => new Date(e.date) >= monthStart)
+           .reduce((sum, e) => sum + e.amount, 0);
+
+          document.getElementById('todayTotal').textContent = `₹${todayTotal.toFixed(2)}`;
+          document.getElementById('weekTotal').textContent = `₹${weekTotal.toFixed(2)}`;
+          document.getElementById('monthTotal').textContent = `₹${monthTotal.toFixed(2)}`;
+          document.getElementById('totalExpenses').textContent = `₹${monthTotal.toFixed(2)}`;
+       }
+
+      enableChat() {
+        if (this.expenses.length > 0) {
+          document.getElementById('chatInput').disabled = false;
+          document.getElementById('chatSend').disabled = false;
+        }
+      }
+
+      sendChatMessage() {
+        const input = document.getElementById('chatInput');
+        const message = input.value.trim();
+        if (!message) return;
+
+        const chatArea = document.getElementById('chatArea');
+        
+        // Add user message
+        chatArea.innerHTML += `<p><strong>You:</strong> ${message}</p>`;
+        
+        // Simple AI responses based on spending data
+        const response = this.generateAIResponse(message);
+        chatArea.innerHTML += `<p><strong>AI:</strong> ${response}</p>`;
+        
+        chatArea.scrollTop = chatArea.scrollHeight;
+        input.value = '';
+      }
+
+      generateAIResponse(message) {
+        const totalSpent = this.expenses.reduce((sum, e) => sum + e.amount, 0);
+        const avgPerExpense = totalSpent / this.expenses.length;
+        const categories = [...new Set(this.expenses.map(e => e.category))];
+        
+         const responses = [
+           `Based on your ${this.expenses.length} expenses totaling ₹${totalSpent.toFixed(2)}, your average spending per transaction is ₹${avgPerExpense.toFixed(2)}.`,
+           `You've been spending across ${categories.length} categories. Consider focusing on your highest category to optimize savings.`,
+           `Your total monthly spending is ₹${totalSpent.toFixed(2)}. Try setting a budget 10-15% lower to build savings.`,
+           `I notice you have expenses in ${categories.join(', ')}. Would you like tips for any specific category?`
+         ];
+        
+        return responses[Math.floor(Math.random() * responses.length)];
+      }
+
+      formatCategory(category) {
+        const categories = {
+          food: 'Food & Dining',
+          transport: 'Transportation',
+          shopping: 'Shopping',
+          bills: 'Bills & Utilities',
+          entertainment: 'Entertainment',
+          health: 'Healthcare',
+          other: 'Other'
+        };
+        return categories[category] || category;
+      }
+
+      formatDate(dateString) {
+        return new Date(dateString).toLocaleDateString();
+      }
+
+       saveToStorage() {
+         localStorage.setItem('mibu-expenses', JSON.stringify(this.expenses));
+       }
+
+       // Import functionality
+       showImportModal() {
+         document.getElementById('importModal').classList.add('show');
+         this.resetImportModal();
+       }
+
+       hideImportModal() {
+         document.getElementById('importModal').classList.remove('show');
+       }
+
+       resetImportModal() {
+         document.getElementById('uploadSection').style.display = 'block';
+         document.getElementById('processingSection').classList.remove('show');
+         document.getElementById('resultsSection').classList.remove('show');
+         document.getElementById('pdfInput').value = '';
+         this.foundExpenses = [];
+       }
+
+       async processPDF(file) {
+         // Show processing
+         document.getElementById('uploadSection').style.display = 'none';
+         document.getElementById('processingSection').classList.add('show');
+
+         try {
+           // Simulate PDF processing (in real implementation, you'd use PDF.js or send to backend)
+           await this.simulatePDFAnalysis(file);
+         } catch (error) {
+           alert('Error processing PDF. Please try again.');
+           this.resetImportModal();
+         }
+       }
+
+       async simulatePDFAnalysis(file) {
+         // Simulate AI analysis delay
+         await new Promise(resolve => setTimeout(resolve, 2000));
+
+         // Mock bank statement data - in real implementation, this would come from PDF parsing
+         const mockTransactions = [
+           { description: 'Zomato Order', amount: 450, date: new Date('2024-12-10') },
+           { description: 'Uber Trip', amount: 180, date: new Date('2024-12-10') },
+           { description: 'Grocery Shopping', amount: 1200, date: new Date('2024-12-09') },
+           { description: 'Netflix Subscription', amount: 649, date: new Date('2024-12-08') },
+           { description: 'Electricity Bill', amount: 2100, date: new Date('2024-12-07') },
+           { description: 'Coffee Shop', amount: 120, date: new Date('2024-12-07') },
+           { description: 'Petrol Pump', amount: 800, date: new Date('2024-12-06') },
+           { description: 'Amazon Purchase', amount: 1500, date: new Date('2024-12-05') }
+         ];
+
+         // Filter only debits/expenses (negative transactions)
+         this.foundExpenses = mockTransactions.map(transaction => ({
+           description: transaction.description,
+           amount: transaction.amount,
+           category: this.categorizeExpense(transaction.description),
+           date: transaction.date.toISOString()
+         }));
+
+         this.showResults();
+       }
+
+       showResults() {
+         document.getElementById('processingSection').classList.remove('show');
+         document.getElementById('resultsSection').classList.add('show');
+         
+         document.getElementById('expenseCount').textContent = this.foundExpenses.length;
+         
+         const preview = document.getElementById('expensePreview');
+         preview.innerHTML = this.foundExpenses.map(expense => `
+           <div class="preview-item">
+             <div class="preview-desc">
+               ${expense.description}
+               <div class="preview-category">${this.formatCategory(expense.category)}</div>
+             </div>
+             <div class="preview-date">${this.formatDate(expense.date)}</div>
+             <div class="preview-amount">₹${expense.amount.toFixed(2)}</div>
+           </div>
+         `).join('');
+       }
+
+       importFoundExpenses() {
+         // Add all found expenses to the tracker
+         this.foundExpenses.forEach(expense => {
+           const newExpense = {
+             id: Date.now() + Math.random(), // Ensure unique IDs
+             description: expense.description,
+             category: expense.category,
+             amount: expense.amount,
+             date: expense.date
+           };
+           this.expenses.unshift(newExpense);
+         });
+
+         this.saveToStorage();
+         this.render();
+         this.updateSummary();
+         this.enableChat();
+         
+         // Show success message
+         alert(`Successfully imported ${this.foundExpenses.length} expenses from your bank statement!`);
+         
+         this.hideImportModal();
+       }
+     }
+
+     // Initialize the tracker
+     const tracker = new ExpenseTracker();
+  </script>
+</body>
+</html>
