@@ -50,20 +50,6 @@
       justify-content: space-between;
       padding: 16px 20px;
     }
-    .brand {
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      font-weight: 700;
-      letter-spacing: 0.3px;
-    }
-    .brand-logo {
-      width: 28px;
-      height: 28px;
-      border-radius: 4px;
-      background: linear-gradient(135deg, #ffffff, #cccccc);
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-    }
     .nav-cta {
       display: inline-flex;
       gap: 8px;
@@ -557,19 +543,15 @@
 <body>
   <header>
     <nav class="nav">
-      <a class="brand" href="index.html" aria-label="MiBu Home">
-        <div class="brand-logo"></div>
-        MiBu
-      </a>
+      <div class="user-profile" id="userProfile" style="display: none;">
+        <div class="user-avatar" id="userAvatar">
+          <span id="userInitials"></span>
+        </div>
+        <span class="user-name" id="userName"></span>
+      </div>
        <div class="nav-cta">
          <a class="btn" href="index.html">Home</a>
          <a class="btn btn-primary" href="#" id="importBtn">Import Statement</a>
-         <div class="user-profile" id="userProfile" style="display: none;">
-           <div class="user-avatar" id="userAvatar">
-             <span id="userInitials"></span>
-           </div>
-           <span class="user-name" id="userName"></span>
-         </div>
        </div>
     </nav>
   </header>
@@ -703,14 +685,14 @@
     import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
     import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
 
-    // Firebase configuration (should match authentication.html)
+    // Firebase configuration (matches authentication.html)
     const firebaseConfig = {
-      apiKey: "your-api-key",
-      authDomain: "your-project-id.firebaseapp.com", 
-      projectId: "your-project-id",
-      storageBucket: "your-project-id.appspot.com",
-      messagingSenderId: "your-sender-id",
-      appId: "your-app-id"
+      apiKey: "AIzaSyDuNqQoRb4aX2Vskg4IOOtekgXVQKT1rQs",
+      authDomain: "mibu-20e58.firebaseapp.com",
+      projectId: "mibu-20e58",
+      storageBucket: "mibu-20e58.firebasestorage.app",
+      messagingSenderId: "852314035972",
+      appId: "1:852314035972:web:eccb5166c44695eb396251"
     };
 
     // Initialize Firebase
@@ -732,7 +714,7 @@
             this.showUserProfile(user);
           } else {
             // User is not signed in, redirect to authentication
-            window.location.href = 'authentication.html';
+            window.location.href = '../Backend/authentication.html';
           }
         });
       }

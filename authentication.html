@@ -230,9 +230,9 @@
 <body>
   <header>
     <nav class="nav">
-      <a class="brand" href="index.html" aria-label="MiBu Home">
+      <a class="brand" href="../Front End/index.html" aria-label="MiBu Home">
       </a>
-      <a class="btn" href="index.html">Home</a>
+      <a class="btn" href="../Front End/index.html">Home</a>
     </nav>
   </header>
 
@@ -265,21 +265,27 @@
     import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
     import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
 
-    // Your web app's Firebase configuration
-    // TODO: Replace with your actual Firebase config
-    const firebaseConfig = {
-      apiKey: "your-api-key",
-      authDomain: "your-project-id.firebaseapp.com",
-      projectId: "your-project-id",
-      storageBucket: "your-project-id.appspot.com",
-      messagingSenderId: "your-sender-id",
-      appId: "your-app-id"
-    };
+     // Your web app's Firebase configuration
+     const firebaseConfig = {
+       apiKey: "AIzaSyDuNqQoRb4aX2Vskg4IOOtekgXVQKT1rQs",
+       authDomain: "mibu-20e58.firebaseapp.com",
+       projectId: "mibu-20e58",
+       storageBucket: "mibu-20e58.firebasestorage.app",
+       messagingSenderId: "852314035972",
+       appId: "1:852314035972:web:eccb5166c44695eb396251"
+     };
 
     // Initialize Firebase
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const provider = new GoogleAuthProvider();
+    
+    // Configure Google Auth Provider
+    provider.addScope('email');
+    provider.addScope('profile');
+    provider.setCustomParameters({
+      'prompt': 'select_account'
+    });
 
     // UI Elements
     const signInBtn = document.getElementById('googleSignInBtn');
@@ -293,7 +299,7 @@
     onAuthStateChanged(auth, (user) => {
       if (user) {
         // User is signed in, redirect to tracker
-        window.location.href = 'tracker.html';
+        window.location.href = '../Front End/tracker.html';
       }
     });
 
@@ -319,13 +325,36 @@
         localStorage.setItem('mibu-user', JSON.stringify(userInfo));
         
         // Redirect to tracker
-        window.location.href = 'tracker.html';
+        window.location.href = '../Front End/tracker.html';
         
       } catch (error) {
         console.error('Authentication error:', error);
         
-        // Show error message
-        errorMessage.textContent = 'Failed to sign in. Please try again.';
+        // Show detailed error message
+        let errorText = 'Failed to sign in. ';
+        
+        switch (error.code) {
+          case 'auth/unauthorized-domain':
+            errorText += 'This domain is not authorized. Please contact support.';
+            break;
+          case 'auth/popup-blocked':
+            errorText += 'Popup was blocked by your browser. Please allow popups and try again.';
+            break;
+          case 'auth/popup-closed-by-user':
+            errorText += 'Sign-in was cancelled. Please try again.';
+            break;
+          case 'auth/cancelled-popup-request':
+            errorText += 'Only one popup request is allowed at a time.';
+            break;
+          case 'auth/network-request-failed':
+            errorText += 'Network error. Please check your connection and try again.';
+            break;
+          default:
+            errorText += `Error: ${error.message}`;
+            break;
+        }
+        
+        errorMessage.textContent = errorText;
         errorMessage.style.display = 'block';
         
         // Reset UI
