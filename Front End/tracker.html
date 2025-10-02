@@ -1,0 +1,1644 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark light">
+  <title>Tracker — MiBu</title>
+  <style>
+    :root {
+      --bg: #000000;
+      --bg-2: #111111;
+      --text: #ffffff;
+      --muted: #888888;
+      --brand: #ffffff;
+      --accent: #cccccc;
+      --glass: rgba(255, 255, 255, 0.03);
+      --border: rgba(255, 255, 255, 0.08);
+      --shadow-strong: 0 8px 32px rgba(0, 0, 0, 0.6);
+      --radius: 8px;
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      height: 100%;
+      background: var(--bg);
+      color: var(--text);
+      margin: 0;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    /* Navigation */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      backdrop-filter: blur(10px);
+      background: rgba(0, 0, 0, 0.8);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav {
+      max-width: 1120px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 20px;
+    }
+    .nav-cta {
+      display: inline-flex;
+      gap: 8px;
+      align-items: center;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.05);
+      color: var(--text);
+      transition: all 0.2s ease;
+      font-weight: 500;
+    }
+    .btn:hover { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.2); }
+    .btn-primary {
+      background: #ffffff;
+      border: none;
+      color: #000000;
+      font-weight: 600;
+    }
+    .btn-primary:hover { background: #f0f0f0; }
+
+    /* User Profile */
+    .user-profile {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      padding: 4px;
+      border-radius: 6px;
+      transition: background 0.2s ease;
+    }
+    .user-profile:hover {
+      background: rgba(255,255,255,0.05);
+    }
+    .user-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #ffffff, #cccccc);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 600;
+      color: #000000;
+      overflow: hidden;
+    }
+    .user-avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .user-name {
+      font-size: 14px;
+      font-weight: 500;
+      max-width: 120px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    @media (max-width: 600px) {
+      .user-name { display: none; }
+    }
+
+    /* Main Layout */
+    main { 
+      max-width: 1120px; 
+      margin: 0 auto; 
+      padding: 20px; 
+      min-height: calc(100vh - 120px); 
+    }
+    
+    .page-title {
+      text-align: center;
+      margin: 20px 0 30px;
+      font-size: clamp(32px, 5vw, 48px);
+      font-weight: 900;
+      letter-spacing: -1px;
+      color: var(--text);
+    }
+
+    .tracker-container {
+      display: grid;
+      grid-template-columns: 1fr 300px;
+      gap: 24px;
+    }
+    @media (max-width: 900px) {
+      .tracker-container { grid-template-columns: 1fr; }
+    }
+
+    .glass {
+      position: relative;
+      background: rgba(255,255,255,0.02);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-strong);
+      overflow: hidden;
+    }
+
+    /* Add Expense Form */
+    .add-expense {
+      padding: 24px;
+      margin-bottom: 24px;
+    }
+    .add-expense h2 {
+      margin: 0 0 20px;
+      font-size: 20px;
+      font-weight: 700;
+    }
+     .form-grid {
+       display: grid;
+       grid-template-columns: 1fr 120px 1fr;
+       gap: 12px;
+       margin-bottom: 16px;
+     }
+     @media (max-width: 600px) {
+       .form-grid { grid-template-columns: 1fr; }
+     }
+    
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    label {
+      font-size: 14px;
+      color: var(--muted);
+      font-weight: 500;
+    }
+    input, select {
+      padding: 12px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.05);
+      color: var(--text);
+      font-size: 14px;
+    }
+     input:focus, select:focus {
+       outline: none;
+       border-color: rgba(255,255,255,0.2);
+       background: rgba(255,255,255,0.08);
+     }
+     
+     /* Remove number input spinners */
+     input[type="number"]::-webkit-outer-spin-button,
+     input[type="number"]::-webkit-inner-spin-button {
+       -webkit-appearance: none;
+       margin: 0;
+     }
+     input[type="number"] {
+       -moz-appearance: textfield;
+       appearance: textfield;
+     }
+     
+     .ai-category-display {
+       display: flex;
+       flex-direction: column;
+       gap: 6px;
+     }
+     .category-preview {
+       padding: 12px;
+       border-radius: 6px;
+       border: 1px solid var(--border);
+       background: rgba(255,255,255,0.02);
+       color: var(--muted);
+       font-size: 14px;
+       min-height: 42px;
+       display: flex;
+       align-items: center;
+       transition: all 0.3s ease;
+     }
+     .category-preview.active {
+       color: var(--text);
+       background: rgba(255,255,255,0.05);
+       border-color: rgba(255,255,255,0.15);
+     }
+     .category-badge {
+       display: inline-flex;
+       align-items: center;
+       gap: 6px;
+       padding: 4px 8px;
+       border-radius: 12px;
+       background: rgba(255,255,255,0.1);
+       font-size: 12px;
+       font-weight: 500;
+     }
+
+    /* Expense List */
+    .expense-list {
+      padding: 24px;
+    }
+    .expense-list h2 {
+      margin: 0 0 20px;
+      font-size: 20px;
+      font-weight: 700;
+    }
+    .expense-item {
+      display: grid;
+      grid-template-columns: 1fr 80px 60px;
+      gap: 12px;
+      padding: 16px;
+      border-radius: 6px;
+      background: rgba(255,255,255,0.02);
+      border: 1px solid var(--border);
+      margin-bottom: 12px;
+      align-items: center;
+    }
+    .expense-info h3 {
+      margin: 0 0 4px;
+      font-size: 16px;
+      font-weight: 600;
+    }
+    .expense-info p {
+      margin: 0;
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .expense-amount {
+      text-align: right;
+      font-weight: 700;
+      font-size: 16px;
+    }
+    .delete-btn {
+      background: none;
+      border: 1px solid rgba(255,255,255,0.1);
+      color: var(--muted);
+      padding: 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .delete-btn:hover {
+      background: rgba(255,0,0,0.1);
+      border-color: rgba(255,0,0,0.3);
+      color: #ff6b6b;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+    .summary-card {
+      padding: 20px;
+    }
+    .summary-card h3 {
+      margin: 0 0 16px;
+      font-size: 18px;
+      font-weight: 700;
+    }
+    .summary-item {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--border);
+    }
+    .summary-item:last-child {
+      border-bottom: none;
+      margin-bottom: 0;
+    }
+    .summary-label {
+      color: var(--muted);
+      font-size: 14px;
+    }
+    .summary-value {
+      font-weight: 600;
+      font-size: 14px;
+    }
+
+    /* Spending Chart */
+    .spending-chart {
+      padding: 20px;
+      margin-top: 24px;
+    }
+    .spending-chart h3 {
+      margin: 0 0 16px;
+      font-size: 18px;
+      font-weight: 700;
+    }
+    .chart-container {
+      height: 200px;
+      display: flex;
+      align-items: end;
+      gap: 8px;
+      padding: 20px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .chart-bar {
+      flex: 1;
+      background: linear-gradient(to top, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
+      border-radius: 4px 4px 0 0;
+      min-height: 20px;
+      position: relative;
+      transition: all 0.3s ease;
+    }
+    .chart-bar:hover {
+      background: linear-gradient(to top, rgba(255,255,255,0.2), rgba(255,255,255,0.1));
+    }
+    .chart-label {
+      position: absolute;
+      bottom: -25px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 12px;
+      color: var(--muted);
+      white-space: nowrap;
+    }
+    .chart-value {
+      position: absolute;
+      top: -25px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 11px;
+      color: var(--text);
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    
+    /* Floating AI Button */
+    .floating-ai {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      width: 60px;
+      height: 60px;
+      background: linear-gradient(135deg, #ffffff, #f0f0f0);
+      border: none;
+      border-radius: 50%;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      transition: all 0.3s ease;
+      z-index: 100;
+      position: relative;
+    }
+    .floating-ai:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+    }
+    .floating-ai.premium-required {
+      background: linear-gradient(135deg, #ffd700, #ffed4e);
+      color: #000000;
+    }
+    .floating-ai.premium-required::after {
+      content: '👑';
+      position: absolute;
+      top: -8px;
+      right: -8px;
+      background: #ffd700;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      border: 2px solid var(--bg);
+    }
+    
+    /* AI Chat Modal */
+    .ai-modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.8);
+      display: none;
+      place-items: center;
+      z-index: 1001;
+      backdrop-filter: blur(8px);
+    }
+    .ai-modal.show {
+      display: grid;
+    }
+    .ai-modal-content {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 24px;
+      max-width: 500px;
+      width: 90%;
+      height: 400px;
+      display: flex;
+      flex-direction: column;
+    }
+    .ai-modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    .ai-modal-title {
+      font-size: 20px;
+      font-weight: 700;
+      margin: 0;
+    }
+    .chat-area {
+      flex: 1;
+      background: rgba(255,255,255,0.02);
+      border-radius: 6px;
+      padding: 12px;
+      margin-bottom: 12px;
+      overflow-y: auto;
+      font-size: 14px;
+      color: var(--muted);
+    }
+    .chat-input {
+      display: flex;
+      gap: 8px;
+    }
+    .chat-input input {
+      flex: 1;
+      padding: 8px 12px;
+      font-size: 14px;
+    }
+    .chat-send {
+      padding: 8px 16px;
+      background: #ffffff;
+      color: #000000;
+      border: none;
+      border-radius: 6px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .typing {
+      color: var(--muted);
+      font-style: italic;
+    }
+
+    /* Empty State */
+    .empty-state {
+      text-align: center;
+      padding: 40px 20px;
+      color: var(--muted);
+    }
+    .empty-state h3 {
+      margin: 0 0 8px;
+      font-size: 18px;
+      color: var(--text);
+    }
+
+     footer { 
+       text-align: center;
+       padding: 20px;
+       color: var(--muted);
+       font-size: 14px;
+       border-top: 1px solid var(--border);
+       margin-top: 40px;
+     }
+
+     /* Import Modal */
+     .modal {
+       position: fixed;
+       inset: 0;
+       background: rgba(0, 0, 0, 0.8);
+       display: none;
+       place-items: center;
+       z-index: 1000;
+       backdrop-filter: blur(8px);
+     }
+     .modal.show {
+       display: grid;
+     }
+     .modal-content {
+       background: var(--bg);
+       border: 1px solid var(--border);
+       border-radius: 12px;
+       padding: 32px;
+       max-width: 500px;
+       width: 90%;
+       position: relative;
+     }
+     .modal-header {
+       display: flex;
+       justify-content: space-between;
+       align-items: center;
+       margin-bottom: 24px;
+     }
+     .modal-title {
+       font-size: 24px;
+       font-weight: 700;
+       margin: 0;
+     }
+     .close-btn {
+       background: none;
+       border: none;
+       color: var(--muted);
+       font-size: 24px;
+       cursor: pointer;
+       padding: 4px;
+       border-radius: 4px;
+       transition: color 0.2s ease;
+     }
+     .close-btn:hover {
+       color: var(--text);
+       background: rgba(255,255,255,0.1);
+     }
+     
+     .upload-area {
+       border: 2px dashed var(--border);
+       border-radius: 8px;
+       padding: 40px 20px;
+       text-align: center;
+       margin-bottom: 20px;
+       transition: all 0.3s ease;
+       cursor: pointer;
+     }
+     .upload-area:hover,
+     .upload-area.dragover {
+       border-color: rgba(255,255,255,0.3);
+       background: rgba(255,255,255,0.02);
+     }
+     .upload-icon {
+       font-size: 48px;
+       margin-bottom: 16px;
+       color: var(--muted);
+     }
+     .upload-text {
+       font-size: 16px;
+       margin-bottom: 8px;
+     }
+     .upload-subtext {
+       font-size: 14px;
+       color: var(--muted);
+     }
+     .file-input {
+       display: none;
+     }
+     
+     .processing {
+       display: none;
+       text-align: center;
+       padding: 20px;
+     }
+     .processing.show {
+       display: block;
+     }
+     .spinner {
+       width: 40px;
+       height: 40px;
+       border: 3px solid var(--border);
+       border-top: 3px solid var(--text);
+       border-radius: 50%;
+       animation: spin 1s linear infinite;
+       margin: 0 auto 16px;
+     }
+     @keyframes spin {
+       to { transform: rotate(360deg); }
+     }
+     
+     .results {
+       display: none;
+       margin-top: 20px;
+     }
+     .results.show {
+       display: block;
+     }
+     .results-header {
+       display: flex;
+       justify-content: space-between;
+       align-items: center;
+       margin-bottom: 16px;
+     }
+     .expense-preview {
+       max-height: 300px;
+       overflow-y: auto;
+       border: 1px solid var(--border);
+       border-radius: 6px;
+       padding: 12px;
+       background: rgba(255,255,255,0.02);
+     }
+     .preview-item {
+       display: grid;
+       grid-template-columns: 1fr 80px 80px;
+       gap: 12px;
+       align-items: center;
+       padding: 12px 0;
+       border-bottom: 1px solid var(--border);
+     }
+     .preview-item:last-child {
+       border-bottom: none;
+     }
+     .preview-desc {
+       font-size: 14px;
+     }
+     .preview-category {
+       font-size: 12px;
+       color: var(--muted);
+       margin-top: 4px;
+     }
+     .preview-date {
+       font-size: 12px;
+       color: var(--muted);
+       text-align: center;
+     }
+     .preview-amount {
+       font-weight: 600;
+       color: #ff6b6b;
+       text-align: right;
+     }
+  </style>
+</head>
+<body>
+  <header>
+    <nav class="nav">
+      <div class="user-profile" id="userProfile" style="display: none;">
+        <div class="user-avatar" id="userAvatar">
+          <span id="userInitials"></span>
+        </div>
+        <span class="user-name" id="userName"></span>
+      </div>
+       <div class="nav-cta">
+         <a class="btn" href="index.html">Home</a>
+         <a class="btn btn-primary" href="#" id="importBtn">Import Statement</a>
+       </div>
+    </nav>
+  </header>
+
+  <main>
+    <h1 class="page-title">Track wisely, live freely.</h1>
+    
+    <div class="tracker-container">
+      <div class="main-content">
+        <!-- Add Expense Form -->
+        <div class="glass add-expense">
+          <h2>Add New Expense</h2>
+          <form id="expenseForm">
+             <div class="form-grid">
+               <div class="form-group">
+                 <label for="description">Description</label>
+                 <input type="text" id="description" placeholder="Coffee, Lunch, Uber ride, etc." required>
+               </div>
+               <div class="form-group">
+                 <label for="amount">Amount (₹)</label>
+                 <input type="number" id="amount" step="0.01" placeholder="0.00" required>
+               </div>
+               <div class="form-group">
+                 <div class="ai-category-display">
+                   <label>Category</label>
+                   <div id="suggestedCategory" class="category-preview"></div>
+                 </div>
+               </div>
+             </div>
+            <button type="submit" class="btn btn-primary">Add Expense</button>
+          </form>
+        </div>
+
+        <!-- Expense List -->
+        <div class="glass expense-list">
+          <h2>Recent Expenses</h2>
+          <div id="expensesList">
+            <div class="empty-state">
+              <h3>No expenses yet</h3>
+              <p>Add your first expense above to get started tracking</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="sidebar">
+         <!-- Summary -->
+         <div class="glass summary-card">
+           <h2>Summary</h2>
+           <h4><span id="currentMonth"></span></h4>
+           <div class="summary-item">
+             <span class="summary-label">Today</span>
+             <span class="summary-value" id="todayTotal">₹0.00</span>
+           </div>
+           <div class="summary-item">
+             <span class="summary-label">This Week</span>
+             <span class="summary-value" id="weekTotal">₹0.00</span>
+           </div>
+           <div class="summary-item">
+             <span class="summary-label">This Month</span>
+             <span class="summary-value" id="monthTotal">₹0.00</span>
+           </div>
+           <div class="summary-item">
+             <span class="summary-label">Total Spent.</span>
+             <span class="summary-value" id="totalExpenses">0</span>
+           </div>
+         </div>
+
+        <!-- Spending Visualization -->
+        <div class="glass spending-chart">
+          <h3>Spending Overview</h3>
+          <div class="chart-container" id="spendingChart">
+            <div class="chart-bar" style="height: 20px;">
+              <div class="chart-label">No data</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Floating AI Button -->
+  <button class="floating-ai" id="floatingAI" title="AI Advisor">
+    🤖
+  </button>
+
+  <!-- AI Chat Modal -->
+  <div id="aiModal" class="ai-modal">
+    <div class="ai-modal-content">
+      <div class="ai-modal-header">
+        <h3 class="ai-modal-title">AI Advisor</h3>
+        <button class="close-btn" id="closeAIModal">&times;</button>
+      </div>
+      <div class="chat-area" id="chatArea">
+        <p>👋 Hi! I'm your AI spending advisor powered by Gemini. Add some expenses and I'll provide personalized insights about your spending patterns and suggest ways to save money. Try asking me things like:</p>
+        <p style="color: var(--muted); font-size: 13px; margin-left: 20px;">
+          • "How can I reduce my spending?"<br>
+          • "What's my biggest expense category?"<br>
+          • "Give me budgeting tips"<br>
+          • "Analyze my spending habits"
+        </p>
+      </div>
+      <div class="chat-input">
+        <input type="text" id="chatInput" placeholder="Ask about your spending..." disabled>
+        <button class="chat-send" id="chatSend" disabled>Send</button>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    © <span id="year"></span> MiBu. All rights reserved.
+  </footer>
+
+  <!-- Import Modal -->
+  <div id="importModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title">Import Bank Statement</h2>
+        <button class="close-btn" id="closeModal">&times;</button>
+      </div>
+      
+      <div id="uploadSection">
+        <div class="upload-area" id="uploadArea">
+          <div class="upload-icon">📄</div>
+          <div class="upload-text">Drop your bank statement PDF here</div>
+          <div class="upload-subtext">or click to browse files</div>
+        </div>
+        <input type="file" id="pdfInput" class="file-input" accept=".pdf" />
+        <p style="font-size: 14px; color: var(--muted); text-align: center; margin-top: 12px;">
+          AI will automatically extract and categorize expenses from your statement
+        </p>
+      </div>
+
+      <div id="processingSection" class="processing">
+        <div class="spinner"></div>
+        <div>Analyzing PDF...</div>
+        <div style="font-size: 14px; color: var(--muted); margin-top: 8px;">
+          Extracting transactions and categorizing expenses
+        </div>
+      </div>
+
+      <div id="resultsSection" class="results">
+        <div class="results-header">
+          <h3>Found <span id="expenseCount">0</span> Expenses</h3>
+          <button class="btn btn-primary" id="importExpenses">Import All</button>
+        </div>
+        <div id="expensePreview" class="expense-preview">
+          <!-- Preview items will be populated here -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Firebase SDKs -->
+  <script type="module">
+    // Import Firebase functions
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+    import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+
+    // Firebase configuration (matches authentication.html)
+    const firebaseConfig = {
+      apiKey: "AIzaSyDuNqQoRb4aX2Vskg4IOOtekgXVQKT1rQs",
+      authDomain: "mibu-20e58.firebaseapp.com",
+      projectId: "mibu-20e58",
+      storageBucket: "mibu-20e58.firebasestorage.app",
+      messagingSenderId: "852314035972",
+      appId: "1:852314035972:web:eccb5166c44695eb396251"
+    };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    // Authentication management
+    class AuthManager {
+      constructor() {
+        this.currentUser = null;
+        this.init();
+      }
+
+      init() {
+        // Check authentication state
+        onAuthStateChanged(auth, (user) => {
+          if (user) {
+            this.currentUser = user;
+            this.showUserProfile(user);
+          } else {
+            // User is not signed in, redirect to authentication
+            window.location.href = '../Backend/authentication.html';
+          }
+        });
+      }
+
+      showUserProfile(user) {
+        const userProfile = document.getElementById('userProfile');
+        const userAvatar = document.getElementById('userAvatar');
+        const userInitials = document.getElementById('userInitials');
+        const userName = document.getElementById('userName');
+
+        // Show user profile
+        userProfile.style.display = 'flex';
+        
+        // Set user name
+        userName.textContent = user.displayName || user.email.split('@')[0];
+        
+        // Set avatar
+        if (user.photoURL) {
+          userAvatar.innerHTML = `<img src="${user.photoURL}" alt="Profile">`;
+        } else {
+          // Use initials as fallback
+          const initials = this.getInitials(user.displayName || user.email);
+          userInitials.textContent = initials;
+        }
+
+        // Add click handler for sign out
+        userProfile.addEventListener('click', () => {
+          this.showSignOutConfirm();
+        });
+      }
+
+      getInitials(name) {
+        if (!name) return 'U';
+        const names = name.split(' ');
+        if (names.length >= 2) {
+          return (names[0][0] + names[1][0]).toUpperCase();
+        }
+        return name[0].toUpperCase();
+      }
+
+      showSignOutConfirm() {
+        const confirmSignOut = confirm('Are you sure you want to sign out?');
+        if (confirmSignOut) {
+          this.signOut();
+        }
+      }
+
+      async signOut() {
+        try {
+          await signOut(auth);
+          localStorage.removeItem('mibu-user');
+          localStorage.removeItem('mibu-expenses');
+          window.location.href = 'index.html';
+        } catch (error) {
+          console.error('Sign out error:', error);
+          alert('Failed to sign out. Please try again.');
+        }
+      }
+    }
+
+    // Initialize authentication manager
+    window.authManager = new AuthManager();
+  </script>
+
+  <script>
+    class ExpenseTracker {
+      constructor() {
+        this.expenses = JSON.parse(localStorage.getItem('mibu-expenses') || '[]');
+        this.geminiApiKey = 'AIzaSyCRt85f6Jw9v905M9Wt2UvPKLf_OnemWcl';
+        this.geminiApiUrl = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent';
+        this.init();
+      }
+
+       init() {
+         this.bindEvents();
+         this.render();
+         this.updateSummary();
+         this.updateSpendingChart();
+          this.setCurrentMonth();
+          this.initAICategories();
+          this.checkPremiumStatus();
+          this.updateAIButtonAppearance();
+          
+          // Footer year
+         document.getElementById('year').textContent = new Date().getFullYear();
+       }
+
+       initAICategories() {
+         // AI categorization keywords
+         this.categoryKeywords = {
+           food: ['coffee', 'lunch', 'dinner', 'breakfast', 'restaurant', 'food', 'meal', 'snack', 'pizza', 'burger', 'zomato', 'swiggy', 'dominos', 'kfc', 'mcdonalds', 'cafe', 'tea', 'juice', 'grocery', 'vegetables', 'fruits', 'milk', 'bread'],
+           transport: ['uber', 'ola', 'taxi', 'bus', 'metro', 'train', 'flight', 'petrol', 'diesel', 'fuel', 'parking', 'toll', 'auto', 'rickshaw', 'bike', 'car', 'transport', 'travel', 'commute'],
+           shopping: ['amazon', 'flipkart', 'myntra', 'shopping', 'clothes', 'shirt', 'shoes', 'electronics', 'mobile', 'laptop', 'headphones', 'watch', 'bag', 'book', 'gift', 'online', 'store', 'mall'],
+           bills: ['electricity', 'water', 'gas', 'internet', 'wifi', 'mobile bill', 'phone bill', 'rent', 'maintenance', 'insurance', 'loan', 'emi', 'credit card', 'utility', 'broadband', 'cable', 'dtv'],
+           entertainment: ['movie', 'cinema', 'netflix', 'spotify', 'prime', 'hotstar', 'game', 'concert', 'party', 'club', 'bar', 'entertainment', 'fun', 'music', 'youtube', 'subscription'],
+           health: ['doctor', 'medicine', 'pharmacy', 'hospital', 'clinic', 'health', 'medical', 'checkup', 'lab', 'test', 'dentist', 'gym', 'fitness', 'yoga', 'supplements', 'vitamins'],
+           other: ['gift', 'donation', 'miscellaneous', 'other', 'personal', 'savings', 'investment', 'emergency']
+         };
+       }
+
+       setCurrentMonth() {
+         const months = [
+           'January', 'February', 'March', 'April', 'May', 'June',
+           'July', 'August', 'September', 'October', 'November', 'December'
+         ];
+         const now = new Date();
+         document.getElementById('currentMonth').textContent = `${months[now.getMonth()]} ${now.getFullYear()}`;
+       }
+
+       bindEvents() {
+         document.getElementById('expenseForm').addEventListener('submit', (e) => {
+           e.preventDefault();
+           this.addExpense();
+         });
+
+         // Real-time AI category suggestion
+         document.getElementById('description').addEventListener('input', (e) => {
+           this.suggestCategory(e.target.value);
+         });
+
+         // Floating AI button
+         document.getElementById('floatingAI').addEventListener('click', () => {
+           this.showAIModal();
+         });
+
+         document.getElementById('closeAIModal').addEventListener('click', () => {
+           this.hideAIModal();
+         });
+
+         document.getElementById('chatSend').addEventListener('click', () => {
+           this.sendChatMessage();
+         });
+
+         document.getElementById('chatInput').addEventListener('keypress', (e) => {
+           if (e.key === 'Enter') {
+             this.sendChatMessage();
+           }
+         });
+
+          // Import functionality
+          document.getElementById('importBtn').addEventListener('click', () => {
+            this.handleImportClick();
+          });
+
+         document.getElementById('closeModal').addEventListener('click', () => {
+           this.hideImportModal();
+         });
+
+         document.getElementById('uploadArea').addEventListener('click', () => {
+           document.getElementById('pdfInput').click();
+         });
+
+         document.getElementById('pdfInput').addEventListener('change', (e) => {
+           if (e.target.files[0]) {
+             this.processPDF(e.target.files[0]);
+           }
+         });
+
+         // Drag and drop
+         const uploadArea = document.getElementById('uploadArea');
+         uploadArea.addEventListener('dragover', (e) => {
+           e.preventDefault();
+           uploadArea.classList.add('dragover');
+         });
+
+         uploadArea.addEventListener('dragleave', () => {
+           uploadArea.classList.remove('dragover');
+         });
+
+         uploadArea.addEventListener('drop', (e) => {
+           e.preventDefault();
+           uploadArea.classList.remove('dragover');
+           const files = e.dataTransfer.files;
+           if (files[0] && files[0].type === 'application/pdf') {
+             this.processPDF(files[0]);
+           }
+         });
+
+         document.getElementById('importExpenses').addEventListener('click', () => {
+           this.importFoundExpenses();
+         });
+       }
+
+       suggestCategory(description) {
+         if (!description.trim()) {
+           document.getElementById('suggestedCategory').innerHTML = 'Type description to see category...';
+           document.getElementById('suggestedCategory').classList.remove('active');
+           return;
+         }
+
+         const category = this.categorizeExpense(description);
+         const categoryDisplay = this.formatCategory(category);
+         
+         document.getElementById('suggestedCategory').innerHTML = `
+           <span class="category-badge">🤖 ${categoryDisplay}</span>
+         `;
+         document.getElementById('suggestedCategory').classList.add('active');
+       }
+
+       categorizeExpense(description) {
+         const desc = description.toLowerCase().trim();
+         let maxScore = 0;
+         let bestCategory = 'other';
+
+         // Check each category for keyword matches
+         for (const [category, keywords] of Object.entries(this.categoryKeywords)) {
+           let score = 0;
+           
+           for (const keyword of keywords) {
+             if (desc.includes(keyword)) {
+               // Exact match gets higher score
+               if (desc === keyword) {
+                 score += 10;
+               } else if (desc.startsWith(keyword) || desc.endsWith(keyword)) {
+                 score += 5;
+               } else {
+                 score += 2;
+               }
+             }
+           }
+
+           if (score > maxScore) {
+             maxScore = score;
+             bestCategory = category;
+           }
+         }
+
+         return bestCategory;
+       }
+
+       addExpense() {
+         const description = document.getElementById('description').value;
+         const amount = parseFloat(document.getElementById('amount').value);
+
+         if (!description || !amount) return;
+
+         // Use AI to automatically categorize
+         const category = this.categorizeExpense(description);
+
+        const expense = {
+          id: Date.now(),
+          description,
+          category,
+          amount,
+          date: new Date().toISOString()
+        };
+
+        this.expenses.unshift(expense);
+        this.saveToStorage();
+        this.render();
+        this.updateSummary();
+        this.updateSpendingChart();
+        this.enableChat();
+        
+         // Reset form
+         document.getElementById('expenseForm').reset();
+         document.getElementById('suggestedCategory').innerHTML = 'Type description to see category...';
+         document.getElementById('suggestedCategory').classList.remove('active');
+      }
+
+       deleteExpense(id) {
+         const expense = this.expenses.find(e => e.id === id);
+         if (!expense) return;
+         
+         const confirmDelete = confirm(`Are you sure you want to delete "${expense.description}" (₹${expense.amount.toFixed(2)})?`);
+         if (!confirmDelete) return;
+         
+         this.expenses = this.expenses.filter(expense => expense.id !== id);
+         this.saveToStorage();
+         this.render();
+         this.updateSummary();
+         this.updateSpendingChart();
+       }
+
+      render() {
+        const container = document.getElementById('expensesList');
+        
+        if (this.expenses.length === 0) {
+          container.innerHTML = `
+            <div class="empty-state">
+              <h3>No expenses yet</h3>
+              <p>Add your first expense above to get started tracking</p>
+            </div>
+          `;
+          return;
+        }
+
+        container.innerHTML = this.expenses.map(expense => `
+          <div class="expense-item">
+            <div class="expense-info">
+              <h3>${expense.description}</h3>
+              <p>${this.formatCategory(expense.category)} • ${this.formatDate(expense.date)}</p>
+            </div>
+             <div class="expense-amount">₹${expense.amount.toFixed(2)}</div>
+            <button class="delete-btn" onclick="tracker.deleteExpense(${expense.id})" title="Delete">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              </svg>
+            </button>
+          </div>
+        `).join('');
+      }
+
+       updateSummary() {
+         const now = new Date();
+         const today = now.toDateString();
+         const weekStart = new Date(now.setDate(now.getDate() - now.getDay()));
+         const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+
+         const todayTotal = this.expenses
+           .filter(e => new Date(e.date).toDateString() === today)
+           .reduce((sum, e) => sum + e.amount, 0);
+
+         const weekTotal = this.expenses
+           .filter(e => new Date(e.date) >= weekStart)
+           .reduce((sum, e) => sum + e.amount, 0);
+
+         const monthTotal = this.expenses
+           .filter(e => new Date(e.date) >= monthStart)
+           .reduce((sum, e) => sum + e.amount, 0);
+
+          document.getElementById('todayTotal').textContent = `₹${todayTotal.toFixed(2)}`;
+          document.getElementById('weekTotal').textContent = `₹${weekTotal.toFixed(2)}`;
+          document.getElementById('monthTotal').textContent = `₹${monthTotal.toFixed(2)}`;
+          document.getElementById('totalExpenses').textContent = `₹${monthTotal.toFixed(2)}`;
+       }
+
+      enableChat() {
+        if (this.expenses.length > 0) {
+          document.getElementById('chatInput').disabled = false;
+          document.getElementById('chatSend').disabled = false;
+        }
+      }
+
+      async sendChatMessage() {
+        const input = document.getElementById('chatInput');
+        const message = input.value.trim();
+        if (!message) return;
+
+        const chatArea = document.getElementById('chatArea');
+        const sendButton = document.getElementById('chatSend');
+        
+        // Add user message
+        chatArea.innerHTML += `<p><strong>You:</strong> ${message}</p>`;
+        
+        // Show loading state
+        chatArea.innerHTML += `<p><strong>AI:</strong> <span class="typing">Thinking...</span></p>`;
+        chatArea.scrollTop = chatArea.scrollHeight;
+        
+        // Disable input while processing
+        input.disabled = true;
+        sendButton.disabled = true;
+        sendButton.textContent = 'Thinking...';
+        
+        try {
+          const response = await this.getGeminiResponse(message);
+          // Remove loading message and add real response
+          const messages = chatArea.querySelectorAll('p');
+          messages[messages.length - 1].innerHTML = `<strong>AI:</strong> ${response}`;
+        } catch (error) {
+          console.error('AI Error:', error);
+          const messages = chatArea.querySelectorAll('p');
+          messages[messages.length - 1].innerHTML = `<strong>AI:</strong> Sorry, I'm having trouble connecting right now. Please try again later.`;
+        }
+        
+        // Re-enable input
+        input.disabled = false;
+        sendButton.disabled = false;
+        sendButton.textContent = 'Send';
+        
+        chatArea.scrollTop = chatArea.scrollHeight;
+        input.value = '';
+      }
+
+      async getGeminiResponse(userMessage) {
+        const spendingData = this.getSpendingAnalysis();
+        
+        const prompt = `You are a helpful personal finance advisor. Analyze the user's spending data and provide personalized advice.
+
+User's Spending Data:
+- Total expenses: ${spendingData.totalExpenses}
+- Total amount spent: ₹${spendingData.totalAmount}
+- Average per expense: ₹${spendingData.avgPerExpense}
+- Categories: ${spendingData.categories.join(', ')}
+- Recent expenses: ${spendingData.recentExpenses}
+
+Category breakdown:
+${spendingData.categoryBreakdown}
+
+User's question: "${userMessage}"
+
+Please provide helpful, actionable advice about their spending habits. Keep responses concise (2-3 sentences) and friendly. Focus on practical tips for saving money or improving spending habits. Use Indian Rupees (₹) in your responses.`;
+
+        const requestBody = {
+          contents: [{
+            parts: [{
+              text: prompt
+            }]
+          }]
+        };
+
+        const response = await fetch(`${this.geminiApiUrl}?key=${this.geminiApiKey}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(requestBody)
+        });
+
+        if (!response.ok) {
+          throw new Error(`API request failed: ${response.status}`);
+        }
+
+        const data = await response.json();
+        return data.candidates[0].content.parts[0].text;
+      }
+
+      getSpendingAnalysis() {
+        const totalAmount = this.expenses.reduce((sum, e) => sum + e.amount, 0);
+        const categories = [...new Set(this.expenses.map(e => e.category))];
+        
+        // Category breakdown
+        const categoryTotals = {};
+        this.expenses.forEach(expense => {
+          categoryTotals[expense.category] = (categoryTotals[expense.category] || 0) + expense.amount;
+        });
+        
+        const categoryBreakdown = Object.entries(categoryTotals)
+          .map(([category, amount]) => `${this.formatCategory(category)}: ₹${amount.toFixed(2)}`)
+          .join(', ');
+
+        // Recent expenses (last 5)
+        const recentExpenses = this.expenses.slice(0, 5)
+          .map(e => `${e.description} (₹${e.amount})`)
+          .join(', ');
+
+        return {
+          totalExpenses: this.expenses.length,
+          totalAmount: totalAmount.toFixed(2),
+          avgPerExpense: this.expenses.length > 0 ? (totalAmount / this.expenses.length).toFixed(2) : '0',
+          categories,
+          categoryBreakdown,
+          recentExpenses: recentExpenses || 'No recent expenses'
+        };
+      }
+
+      formatCategory(category) {
+        const categories = {
+          food: 'Food & Dining',
+          transport: 'Transportation',
+          shopping: 'Shopping',
+          bills: 'Bills & Utilities',
+          entertainment: 'Entertainment',
+          health: 'Healthcare',
+          other: 'Other'
+        };
+        return categories[category] || category;
+      }
+
+      formatDate(dateString) {
+        return new Date(dateString).toLocaleDateString();
+      }
+
+       saveToStorage() {
+         localStorage.setItem('mibu-expenses', JSON.stringify(this.expenses));
+       }
+
+        // Premium and Import functionality
+        checkPremiumStatus() {
+          // Check if user came back from premium purchase
+          const urlParams = new URLSearchParams(window.location.search);
+          if (urlParams.get('openImport') === 'true') {
+            // Remove the parameter from URL
+            window.history.replaceState({}, document.title, window.location.pathname);
+            // Update AI button appearance since user is now premium
+            this.updateAIButtonAppearance();
+            // Open import modal directly
+            this.showImportModal();
+          }
+        }
+
+        handleImportClick() {
+          // Check if user has premium
+          if (this.isPremiumUser()) {
+            this.showImportModal();
+          } else {
+            // Redirect to premium page
+            window.location.href = 'premium.html';
+          }
+        }
+
+        isPremiumUser() {
+          return localStorage.getItem('mibu-premium') === 'true';
+        }
+
+        async openRazorpayPayment() {
+          try {
+            // Load Razorpay script if not already loaded
+            if (!window.Razorpay) {
+              await this.loadRazorpayScript();
+            }
+
+            const options = {
+              key: 'rzp_test_1DP5mmOlF5G5ag', // Replace with your Razorpay test key
+              amount: 29900, // ₹299 in paise
+              currency: 'INR',
+              name: 'MiBu Premium',
+              description: 'Premium Features - Bank Statement Import',
+              image: 'https://via.placeholder.com/150x150/000000/FFFFFF?text=MiBu', // Replace with your logo
+              order_id: '', // This will be generated by your backend
+              handler: (response) => {
+                this.handlePaymentSuccess(response);
+              },
+              prefill: {
+                name: window.authManager?.currentUser?.displayName || 'User',
+                email: window.authManager?.currentUser?.email || '',
+                contact: '' // Add phone if available
+              },
+              notes: {
+                address: 'Premium Upgrade',
+                user_id: window.authManager?.currentUser?.uid || 'anonymous'
+              },
+              theme: {
+                color: '#000000'
+              },
+              modal: {
+                ondismiss: () => {
+                  console.log('Payment modal closed');
+                }
+              }
+            };
+
+            const razorpay = new Razorpay(options);
+            razorpay.open();
+
+          } catch (error) {
+            console.error('Razorpay error:', error);
+            alert('Failed to open payment gateway. Please try again.');
+          }
+        }
+
+        async loadRazorpayScript() {
+          return new Promise((resolve, reject) => {
+            const script = document.createElement('script');
+            script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+            script.onload = resolve;
+            script.onerror = reject;
+            document.head.appendChild(script);
+          });
+        }
+
+        async handlePaymentSuccess(response) {
+          try {
+            // In a real implementation, you would verify the payment on your backend
+            // For now, we'll simulate successful verification
+            
+            console.log('Payment successful:', response);
+            
+            // Set premium status
+            localStorage.setItem('mibu-premium', 'true');
+            localStorage.setItem('mibu-premium-date', new Date().toISOString());
+            localStorage.setItem('mibu-payment-id', response.razorpay_payment_id);
+            
+            // Show success message
+            alert('🎉 Payment successful! Welcome to Premium!');
+            
+            // Update AI button appearance
+            this.updateAIButtonAppearance();
+            
+            // Open import modal
+            this.showImportModal();
+            
+          } catch (error) {
+            console.error('Payment verification error:', error);
+            alert('Payment verification failed. Please contact support.');
+          }
+        }
+
+        showImportModal() {
+          document.getElementById('importModal').classList.add('show');
+          this.resetImportModal();
+        }
+
+       hideImportModal() {
+         document.getElementById('importModal').classList.remove('show');
+       }
+
+       resetImportModal() {
+         document.getElementById('uploadSection').style.display = 'block';
+         document.getElementById('processingSection').classList.remove('show');
+         document.getElementById('resultsSection').classList.remove('show');
+         document.getElementById('pdfInput').value = '';
+         this.foundExpenses = [];
+       }
+
+       async processPDF(file) {
+         // Show processing
+         document.getElementById('uploadSection').style.display = 'none';
+         document.getElementById('processingSection').classList.add('show');
+
+         try {
+           // Simulate PDF processing (in real implementation, you'd use PDF.js or send to backend)
+           await this.simulatePDFAnalysis(file);
+         } catch (error) {
+           alert('Error processing PDF. Please try again.');
+           this.resetImportModal();
+         }
+       }
+
+       async simulatePDFAnalysis(file) {
+         // Simulate AI analysis delay
+         await new Promise(resolve => setTimeout(resolve, 2000));
+
+         // Mock bank statement data - in real implementation, this would come from PDF parsing
+         const mockTransactions = [
+           { description: 'Zomato Order', amount: 450, date: new Date('2024-12-10') },
+           { description: 'Uber Trip', amount: 180, date: new Date('2024-12-10') },
+           { description: 'Grocery Shopping', amount: 1200, date: new Date('2024-12-09') },
+           { description: 'Netflix Subscription', amount: 649, date: new Date('2024-12-08') },
+           { description: 'Electricity Bill', amount: 2100, date: new Date('2024-12-07') },
+           { description: 'Coffee Shop', amount: 120, date: new Date('2024-12-07') },
+           { description: 'Petrol Pump', amount: 800, date: new Date('2024-12-06') },
+           { description: 'Amazon Purchase', amount: 1500, date: new Date('2024-12-05') }
+         ];
+
+         // Filter only debits/expenses (negative transactions)
+         this.foundExpenses = mockTransactions.map(transaction => ({
+           description: transaction.description,
+           amount: transaction.amount,
+           category: this.categorizeExpense(transaction.description),
+           date: transaction.date.toISOString()
+         }));
+
+         this.showResults();
+       }
+
+       showResults() {
+         document.getElementById('processingSection').classList.remove('show');
+         document.getElementById('resultsSection').classList.add('show');
+         
+         document.getElementById('expenseCount').textContent = this.foundExpenses.length;
+         
+         const preview = document.getElementById('expensePreview');
+         preview.innerHTML = this.foundExpenses.map(expense => `
+           <div class="preview-item">
+             <div class="preview-desc">
+               ${expense.description}
+               <div class="preview-category">${this.formatCategory(expense.category)}</div>
+             </div>
+             <div class="preview-date">${this.formatDate(expense.date)}</div>
+             <div class="preview-amount">₹${expense.amount.toFixed(2)}</div>
+           </div>
+         `).join('');
+       }
+
+       importFoundExpenses() {
+         // Add all found expenses to the tracker
+         this.foundExpenses.forEach(expense => {
+           const newExpense = {
+             id: Date.now() + Math.random(), // Ensure unique IDs
+             description: expense.description,
+             category: expense.category,
+             amount: expense.amount,
+             date: expense.date
+           };
+           this.expenses.unshift(newExpense);
+         });
+
+         this.saveToStorage();
+         this.render();
+         this.updateSummary();
+         this.updateSpendingChart();
+         this.enableChat();
+         
+         // Show success message
+         alert(`Successfully imported ${this.foundExpenses.length} expenses from your bank statement!`);
+         
+         this.hideImportModal();
+       }
+
+       // AI Modal methods
+       showAIModal() {
+         // Check if user has premium access
+         if (!this.isPremiumUser()) {
+           this.showPremiumRequiredModal();
+           return;
+         }
+         document.getElementById('aiModal').classList.add('show');
+       }
+
+       showPremiumRequiredModal() {
+         const confirmUpgrade = confirm(
+           '🤖 AI Advisor is a Premium Feature!\n\n' +
+           'Get personalized spending insights and financial advice powered by AI.\n\n' +
+           'Upgrade to Premium for just ₹299 (one-time payment) to unlock:\n' +
+           '• AI-powered spending analysis\n' +
+           '• Personalized financial advice\n' +
+           '• Bank statement import\n' +
+           '• Priority support\n\n' +
+           'Would you like to upgrade now?'
+         );
+         
+         if (confirmUpgrade) {
+           window.location.href = 'premium.html';
+         }
+       }
+
+       hideAIModal() {
+         document.getElementById('aiModal').classList.remove('show');
+       }
+
+       // Spending Chart methods
+       updateSpendingChart() {
+         const chartContainer = document.getElementById('spendingChart');
+         
+         if (this.expenses.length === 0) {
+           chartContainer.innerHTML = `
+             <div class="chart-bar" style="height: 20px;">
+               <div class="chart-label">No data</div>
+             </div>
+           `;
+           return;
+         }
+
+         // Get last 7 days of spending
+         const last7Days = [];
+         const today = new Date();
+         
+         for (let i = 6; i >= 0; i--) {
+           const date = new Date(today);
+           date.setDate(date.getDate() - i);
+           last7Days.push({
+             date: date,
+             label: date.toLocaleDateString('en-US', { weekday: 'short' }),
+             amount: 0
+           });
+         }
+
+         // Calculate spending for each day
+         this.expenses.forEach(expense => {
+           const expenseDate = new Date(expense.date);
+           const dayData = last7Days.find(day => 
+             day.date.toDateString() === expenseDate.toDateString()
+           );
+           if (dayData) {
+             dayData.amount += expense.amount;
+           }
+         });
+
+         // Find max amount for scaling
+         const maxAmount = Math.max(...last7Days.map(day => day.amount), 1);
+
+         // Generate chart bars
+         chartContainer.innerHTML = last7Days.map(day => {
+           const height = Math.max((day.amount / maxAmount) * 160, 20);
+           return `
+             <div class="chart-bar" style="height: ${height}px;">
+               <div class="chart-value">₹${day.amount.toFixed(0)}</div>
+               <div class="chart-label">${day.label}</div>
+             </div>
+           `;
+         }).join('');
+       }
+
+       updateAIButtonAppearance() {
+         const floatingAI = document.getElementById('floatingAI');
+         if (this.isPremiumUser()) {
+           floatingAI.classList.remove('premium-required');
+           floatingAI.title = 'AI Advisor - Click to chat';
+         } else {
+           floatingAI.classList.add('premium-required');
+           floatingAI.title = 'AI Advisor - Premium Feature (Click to upgrade)';
+         }
+       }
+     }
+
+     // Initialize the tracker
+     const tracker = new ExpenseTracker();
+  </script>
+</body>
+</html>

@@ -1,0 +1,367 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark light">
+  <title>Sign In — MiBu</title>
+  <style>
+    :root {
+      --bg: #000000;
+      --bg-2: #111111;
+      --text: #ffffff;
+      --muted: #888888;
+      --brand: #ffffff;
+      --accent: #cccccc;
+      --glass: rgba(255, 255, 255, 0.03);
+      --border: rgba(255, 255, 255, 0.08);
+      --shadow-strong: 0 8px 32px rgba(0, 0, 0, 0.6);
+      --radius: 8px;
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      height: 100%;
+      background: var(--bg);
+      color: var(--text);
+      margin: 0;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    /* Navigation */
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      backdrop-filter: blur(10px);
+      background: rgba(0, 0, 0, 0.8);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav {
+      max-width: 1120px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 20px;
+    }
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+    }
+    .brand-logo {
+      width: 28px;
+      height: 28px;
+      border-radius: 4px;
+      background: linear-gradient(135deg, #ffffff, #cccccc);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,0.05);
+      color: var(--text);
+      transition: all 0.2s ease;
+      font-weight: 500;
+    }
+    .btn:hover { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.2); }
+
+     /* Main Layout */
+     main {
+       display: flex;
+       align-items: center;
+       justify-content: center;
+       min-height: calc(100vh - 160px);
+       padding: 16px 16px 8px;
+       flex: 1;
+     }
+
+     .auth-container {
+       background: rgba(255,255,255,0.02);
+       border: 1px solid var(--border);
+       border-radius: 12px;
+       box-shadow: var(--shadow-strong);
+       padding: 28px;
+       max-width: 360px;
+       width: 100%;
+       text-align: center;
+     }
+
+     .auth-title {
+       font-size: clamp(24px, 4vw, 32px);
+       font-weight: 900;
+       letter-spacing: -1px;
+       margin: 0 0 8px;
+     }
+
+     .auth-subtitle {
+       color: var(--muted);
+       margin: 0 0 20px;
+       font-size: 14px;
+       line-height: 1.4;
+     }
+
+     .google-signin-btn {
+       display: flex;
+       align-items: center;
+       justify-content: center;
+       gap: 10px;
+       width: 100%;
+       padding: 12px 16px;
+       border: 1px solid var(--border);
+       border-radius: 8px;
+       background: rgba(255,255,255,0.05);
+       color: var(--text);
+       font-size: 14px;
+       font-weight: 500;
+       cursor: pointer;
+       transition: all 0.2s ease;
+       text-decoration: none;
+     }
+
+    .google-signin-btn:hover {
+      background: rgba(255,255,255,0.1);
+      border-color: rgba(255,255,255,0.2);
+    }
+
+     .google-icon {
+       width: 18px;
+       height: 18px;
+       background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="%23EA4335" d="M5.26620003,9.76452941 C6.19878754,6.93863203 8.85444915,4.90909091 12,4.90909091 C13.6909091,4.90909091 15.2181818,5.50909091 16.4181818,6.49090909 L19.9090909,3 C17.7818182,1.14545455 15.0545455,0 12,0 C7.27272727,0 3.28636364,2.6969697 1.24545455,6.65454545 L5.26620003,9.76452941 Z"/><path fill="%2334A853" d="M16.0407269,18.0125889 C14.9509167,18.7163016 13.5660892,19.0909091 12,19.0909091 C8.86648613,19.0909091 6.21911939,17.076871 5.27698177,14.2678769 L1.23999023,17.3349879 C3.28057613,21.2936293 7.26648613,24 12,24 C14.9328362,24 17.7353462,22.9447701 19.834192,20.9597701 L16.0407269,18.0125889 Z"/><path fill="%23FBBC04" d="M19.834192,20.9597701 C22.0291472,18.9597701 23.4545455,15.8090909 23.4545455,12.2727273 C23.4545455,11.4545455 23.3636364,10.6363636 23.1818182,9.81818182 L12,9.81818182 L12,14.4545455 L18.4909091,14.4545455 C18.1090909,16.0181818 17.0181818,17.2272727 16.0407269,18.0125889 L19.834192,20.9597701 Z"/><path fill="%23EA4335" d="M5.27698177,14.2678769 C5.03832634,13.556323 4.90909091,12.7937589 4.90909091,12 C4.90909091,11.2182781 5.03443647,10.4668121 5.26620003,9.76452941 L1.23999023,6.65544265 C0.43658717,8.26043956 0,10.0753848 0,12 C0,13.9195484 0.444780743,15.7301709 1.23999023,17.3349879 L5.27698177,14.2678769 Z"/></svg>') center/contain no-repeat;
+     }
+
+     .loading {
+       display: none;
+       margin: 12px 0;
+       color: var(--muted);
+       font-size: 14px;
+     }
+
+    .spinner {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border: 2px solid var(--border);
+      border-top: 2px solid var(--text);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-right: 8px;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+     .error-message {
+       background: rgba(255, 107, 107, 0.1);
+       border: 1px solid rgba(255, 107, 107, 0.3);
+       border-radius: 6px;
+       padding: 10px;
+       margin: 12px 0;
+       color: #ff6b6b;
+       font-size: 13px;
+       display: none;
+       line-height: 1.4;
+     }
+
+     footer { 
+       text-align: center;
+       padding: 12px 16px 20px;
+       color: var(--muted);
+       font-size: 12px;
+       border-top: 1px solid var(--border);
+       margin-top: auto;
+     }
+
+     /* Overall page structure */
+     body {
+       display: flex;
+       flex-direction: column;
+       min-height: 100vh;
+     }
+
+     /* Responsive adjustments */
+     @media (max-width: 480px) {
+       main {
+         padding: 12px 12px 6px;
+       }
+       
+       .auth-container {
+         padding: 20px 16px;
+         margin: 4px;
+       }
+       
+       .auth-title {
+         font-size: 24px;
+       }
+       
+       .auth-subtitle {
+         margin: 0 0 16px;
+       }
+       
+       .google-signin-btn {
+         padding: 10px 14px;
+         font-size: 13px;
+       }
+       
+       .google-icon {
+         width: 16px;
+         height: 16px;
+       }
+       
+       footer {
+         padding: 10px 16px 16px;
+       }
+     }
+  </style>
+</head>
+<body>
+  <header>
+    <nav class="nav">
+      <a class="brand" href="../Front End/index.html" aria-label="MiBu Home">
+      </a>
+      <a class="btn" href="../Front End/index.html">Home</a>
+    </nav>
+  </header>
+
+  <main>
+    <div class="auth-container">
+      <h1 class="auth-title">Welcome to MiBu</h1>
+      <p class="auth-subtitle">Sign in to start tracking your expenses</p>
+      
+      <button class="google-signin-btn" id="googleSignInBtn">
+        <div class="google-icon"></div>
+        Continue with Google
+      </button>
+      
+      <div class="loading" id="loadingIndicator">
+        <div class="spinner"></div>
+        Signing you in...
+      </div>
+      
+      <div class="error-message" id="errorMessage"></div>
+    </div>
+  </main>
+
+  <footer>
+    © <span id="year"></span> MiBu. All rights reserved.
+  </footer>
+
+  <!-- Firebase SDKs -->
+  <script type="module">
+    // Import the functions you need from the SDKs you need
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+    import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+
+     // Your web app's Firebase configuration
+     const firebaseConfig = {
+       apiKey: "AIzaSyDuNqQoRb4aX2Vskg4IOOtekgXVQKT1rQs",
+       authDomain: "mibu-20e58.firebaseapp.com",
+       projectId: "mibu-20e58",
+       storageBucket: "mibu-20e58.firebasestorage.app",
+       messagingSenderId: "852314035972",
+       appId: "1:852314035972:web:eccb5166c44695eb396251"
+     };
+
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const provider = new GoogleAuthProvider();
+    
+    // Configure Google Auth Provider
+    provider.addScope('email');
+    provider.addScope('profile');
+    provider.setCustomParameters({
+      'prompt': 'select_account'
+    });
+
+    // UI Elements
+    const signInBtn = document.getElementById('googleSignInBtn');
+    const loadingIndicator = document.getElementById('loadingIndicator');
+    const errorMessage = document.getElementById('errorMessage');
+
+    // Set current year
+    document.getElementById('year').textContent = new Date().getFullYear();
+
+    // Check if user is already signed in
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        // User is signed in, redirect to tracker
+        window.location.href = '../Front End/tracker.html';
+      }
+    });
+
+    // Google Sign In
+    signInBtn.addEventListener('click', async () => {
+      try {
+        // Show loading state
+        signInBtn.style.display = 'none';
+        loadingIndicator.style.display = 'block';
+        errorMessage.style.display = 'none';
+
+        // Sign in with Google
+        const result = await signInWithPopup(auth, provider);
+        const user = result.user;
+        
+        // Store user info in localStorage for easy access
+        const userInfo = {
+          uid: user.uid,
+          displayName: user.displayName,
+          email: user.email,
+          photoURL: user.photoURL
+        };
+        localStorage.setItem('mibu-user', JSON.stringify(userInfo));
+        
+        // Redirect to tracker
+        window.location.href = '../Front End/tracker.html';
+        
+      } catch (error) {
+        console.error('Authentication error:', error);
+        
+        // Show detailed error message
+        let errorText = 'Failed to sign in. ';
+        
+        switch (error.code) {
+          case 'auth/unauthorized-domain':
+            errorText += 'This domain is not authorized. Please contact support.';
+            break;
+          case 'auth/popup-blocked':
+            errorText += 'Popup was blocked by your browser. Please allow popups and try again.';
+            break;
+          case 'auth/popup-closed-by-user':
+            errorText += 'Sign-in was cancelled. Please try again.';
+            break;
+          case 'auth/cancelled-popup-request':
+            errorText += 'Only one popup request is allowed at a time.';
+            break;
+          case 'auth/network-request-failed':
+            errorText += 'Network error. Please check your connection and try again.';
+            break;
+          default:
+            errorText += `Error: ${error.message}`;
+            break;
+        }
+        
+        errorMessage.textContent = errorText;
+        errorMessage.style.display = 'block';
+        
+        // Reset UI
+        signInBtn.style.display = 'flex';
+        loadingIndicator.style.display = 'none';
+      }
+    });
+  </script>
+</body>
+</html>
